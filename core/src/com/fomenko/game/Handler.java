@@ -33,7 +33,7 @@ public class Handler {
     public void send(JSONObject request) {
         try {
             request.put("check_code", check_code = (int)(Math.random() * 1000000000));
-            System.out.println("GENERATED = " + check_code);
+            //System.out.println("GENERATED = " + check_code);
             /*synchronized (codes) {
                 codes.add(check_code);
             }*/
