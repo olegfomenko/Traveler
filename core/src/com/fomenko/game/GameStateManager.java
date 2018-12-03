@@ -3,6 +3,7 @@ package com.fomenko.game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.fomenko.game.States.State;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 public class GameStateManager {
@@ -26,11 +27,19 @@ public class GameStateManager {
     }
 
     public void update(float dt) {
-        stack.peek().update(dt);
+        try {
+            stack.peek().update(dt);
+        } catch (EmptyStackException e) {
+            e.printStackTrace();
+        }
     }
 
     public void render(SpriteBatch sb) {
-        stack.peek().render(sb);
+        try {
+            stack.peek().render(sb);
+        } catch (EmptyStackException e) {
+            e.printStackTrace();
+        }
     }
 
     public void dispose() {

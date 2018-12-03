@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Deque;
+
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 
 public class Handler {
@@ -21,6 +19,7 @@ public class Handler {
     private volatile LinkedList<Integer> codes;
     private DatagramSocket socket;
     private volatile static int check_code = 0;
+
 
     public Handler(HashMap<Integer, Tank> tanks, DatagramSocket socket) {
         this.tanks = tanks;

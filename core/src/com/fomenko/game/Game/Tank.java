@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Tank {
-    volatile private Texture tank1, tank2, tank3, tank4;
-    volatile private float width, height, x, y;
-    private static final float speed = 120;
-    volatile private int direction; // 1 - up   2 - down   3 - left   4 - right
+    private Texture tank1, tank2, tank3, tank4;
+    private volatile float width, height, x, y;
+    public static final float speed = 120;
+    private volatile int direction; // 1 - up   2 - down   3 - left   4 - right
 
     private int index;
 
@@ -26,7 +26,11 @@ public class Tank {
         tank3 = new Texture("leftTank.png");
         tank4 = new Texture("rightTank.png");
 
-        new Thread(new RandomUpdate(this)).start();
+        //new Thread(new RandomUpdate(this)).start();
+    }
+
+    public int getDirection() {
+        return direction;
     }
 
     public float getX() {
@@ -37,11 +41,11 @@ public class Tank {
         return y;
     }
 
-    public void setX(float x) {
+    public synchronized void setX(float x) {
         this.x = x;
     }
 
-    public void setY(float y) {
+    public synchronized void setY(float y) {
         this.y = y;
     }
 
@@ -57,11 +61,18 @@ public class Tank {
         return index;
     }
 
-    public void setDirection(int direction) {
+    public synchronized void setDirection(int direction) {
         this.direction = direction;
     }
 
-    public void render(SpriteBatch sb) {
+    public void update(float dt) {
+        if(direction == 1) y += speed * dt / 1000.0;
+        if(direction == 2) y -= speed * dt / 1000.0;
+        if(direction == 3) x -= speed * dt / 1000.0;
+        if(direction == 4) x += speed * dt / 1000.0;
+    }
+
+    public synchronized void render(SpriteBatch sb) {
         switch (direction) {
             case 1: sb.draw(tank1, x, y, width, height); break;
             case 2: sb.draw(tank2, x, y, width, height); break;
@@ -88,8 +99,8 @@ public class Tank {
 
         @Override
         public void run() {
-            synchronized(tank) {
-                while(true) {
+            while(true) {
+                synchronized(tank) {
                     //System.out.println(direction);
                     cur = System.currentTimeMillis();
                     dt = cur - last;
