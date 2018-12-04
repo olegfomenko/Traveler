@@ -19,6 +19,8 @@ import java.util.HashMap;
 
 public class Game extends State {
     private Tank tank;
+    private Texture tank1, tank2, tank3, tank4;
+
     private volatile HashMap<Integer,  Tank> tanks;
     boolean pressed;
     private float x, y;
@@ -40,6 +42,12 @@ public class Game extends State {
         pressed = false;
 
         handler = new Handler(tanks, socket);
+
+
+        tank1 = new Texture("upTank.png");
+        tank2 = new Texture("downTank.png");
+        tank3 = new Texture("leftTank.png");
+        tank4 = new Texture("rightTank.png");
 
     }
 
@@ -125,9 +133,7 @@ public class Game extends State {
         Object[] o = tanks.values().toArray();
         for(int i = 0; i < o.length; ++i) {
             Tank t = (Tank)o[i];
-            synchronized(t) {
-               t.update(dt);
-            }
+            t.update(dt);
         }
 
         try {
@@ -150,19 +156,35 @@ public class Game extends State {
         sb.begin();
         sb.draw(background, 0, 0, FIELD_WIDTH, FIELD_HEIGHT);
 
+        //TODO опасное место?
         Object[] o = tanks.values().toArray();
         for(int i = 0; i < o.length; ++i) {
-            synchronized(o[i]) {
-                ((Tank)o[i]).render(sb);
+            drawTank((Tank)o[i], sb);
+        }
+
+        sb.end();
+    }
+
+    public void drawTank(Tank t, SpriteBatch sb) {
+        synchronized (t) {
+            switch (t.getDirection()) {
+                case 1: sb.draw(tank1, t.getX(), t.getY(), t.width, t.height); break;
+                case 2: sb.draw(tank2, t.getX(), t.getY(), t.width, t.height); break;
+                case 3: sb.draw(tank3, t.getX(), t.getY(), t.width, t.height); break;
+                case 4: sb.draw(tank4, t.getX(), t.getY(), t.width, t.height); break;
             }
         }
-        sb.end();
     }
 
     @Override
     public void dispose() {
         background.dispose();
-        for(Tank t : tanks.values()) t.dispose();
+        //for(Tank t : tanks.values()) t.dispose();
         //handler.send("STOP");
+
+        tank1.dispose();
+        tank2.dispose();
+        tank3.dispose();
+        tank4.dispose();
     }
 }

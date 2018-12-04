@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Tank {
-    private Texture tank1, tank2, tank3, tank4;
-    private volatile float width, height, x, y;
+    private volatile float x, y;
+    public static float width, height;
     public static final float speed = 120;
     private volatile int direction; // 1 - up   2 - down   3 - left   4 - right
 
@@ -21,23 +21,22 @@ public class Tank {
 
         direction = 1;
 
-        tank1 = new Texture("upTank.png");
-        tank2 = new Texture("downTank.png");
-        tank3 = new Texture("leftTank.png");
-        tank4 = new Texture("rightTank.png");
-
         //new Thread(new RandomUpdate(this)).start();
     }
 
-    public int getDirection() {
+    public synchronized int getDirection() {
         return direction;
     }
 
-    public float getX() {
+    public synchronized void setDirection(int direction) {
+        this.direction = direction;
+    }
+
+    public synchronized float getX() {
         return x;
     }
 
-    public float getY() {
+    public synchronized float getY() {
         return y;
     }
 
@@ -49,11 +48,11 @@ public class Tank {
         this.y = y;
     }
 
-    public float getWidth() {
+    public synchronized float getWidth() {
         return width;
     }
 
-    public float getHeight() {
+    public synchronized float getHeight() {
         return height;
     }
 
@@ -61,18 +60,17 @@ public class Tank {
         return index;
     }
 
-    public synchronized void setDirection(int direction) {
-        this.direction = direction;
+
+    public synchronized void update(float dt) {
+        synchronized (this) {
+            if(direction == 1) y += speed * dt;
+            if(direction == 2) y -= speed * dt;
+            if(direction == 3) x -= speed * dt;
+            if(direction == 4) x += speed * dt;
+        }
     }
 
-    public void update(float dt) {
-        if(direction == 1) y += speed * dt / 1000.0;
-        if(direction == 2) y -= speed * dt / 1000.0;
-        if(direction == 3) x -= speed * dt / 1000.0;
-        if(direction == 4) x += speed * dt / 1000.0;
-    }
-
-    public synchronized void render(SpriteBatch sb) {
+   /* public synchronized void render(SpriteBatch sb) {
         switch (direction) {
             case 1: sb.draw(tank1, x, y, width, height); break;
             case 2: sb.draw(tank2, x, y, width, height); break;
@@ -86,35 +84,5 @@ public class Tank {
         tank2.dispose();
         tank3.dispose();
         tank4.dispose();
-    }
-
-
-    class RandomUpdate implements Runnable {
-        private Tank tank;
-        private long last = System.currentTimeMillis(), cur, dt;
-
-        public RandomUpdate(Tank tank) {
-            this.tank = tank;
-        }
-
-        @Override
-        public void run() {
-            while(true) {
-                synchronized(tank) {
-                    //System.out.println(direction);
-                    cur = System.currentTimeMillis();
-                    dt = cur - last;
-
-                    last = cur;
-
-                    //System.out.println(direction);
-
-                    if(direction == 1) y += speed * dt / 1000.0;
-                    if(direction == 2) y -= speed * dt / 1000.0;
-                    if(direction == 3) x -= speed * dt / 1000.0;
-                    if(direction == 4) x += speed * dt / 1000.0;
-                }
-            }
-        }
-    }
+    }*/
 }

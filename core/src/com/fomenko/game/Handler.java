@@ -49,7 +49,7 @@ public class Handler {
             while (true) {
                 synchronized (tanks) {
                     try {
-                        byte[] buffer = new byte[1000];
+                        byte[] buffer = new byte[1000000];
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                         socket.receive(packet);
@@ -89,6 +89,13 @@ public class Handler {
                                 tank.setX(Float.parseFloat(obj.getString("x")));
                                 tank.setY(Float.parseFloat(obj.getString("y")));
                                 tank.setDirection(obj.getInt("direction"));
+
+                                /*if(obj.getInt("index") == 0) {
+                                    System.out.println("NEW _______________________"
+                                            + Float.parseFloat(obj.getString("x"))
+                                            + " " + Float.parseFloat(obj.getString("y"))
+                                            + " " + Float.parseFloat(obj.getString("direction")));
+                                }*/
                             }
                         } else if(obj.getString("type").equals("ADD")) {
                             Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));

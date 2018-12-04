@@ -2,6 +2,7 @@ package com.fomenko.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,7 +26,7 @@ public class Main extends ApplicationAdapter {
 	private SpriteBatch sb;
 	private GameStateManager gsm;
 	public static float HEIGHT = 720, WIDTH = 400;
-	public static final String address = "192.168.43.76";
+	public static String address = "192.168.1.44";
 	public static final int port = 5000;
 	private DatagramSocket socket;
 	
