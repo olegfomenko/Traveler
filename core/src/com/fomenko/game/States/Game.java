@@ -73,7 +73,7 @@ public class Game extends State {
                             obj.put("direction", 4);
                             handler.send(obj);
 
-                            tank.setDirection(4);
+                            //tank.setDirection(4);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -85,7 +85,7 @@ public class Game extends State {
                             obj.put("direction", 3);
                             handler.send(obj);
 
-                            tank.setDirection(3);
+                            //tank.setDirection(3);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -101,7 +101,7 @@ public class Game extends State {
                             obj.put("direction", 2);
                             handler.send(obj);
 
-                            tank.setDirection(2);
+                            //tank.setDirection(2);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -113,7 +113,7 @@ public class Game extends State {
                             obj.put("direction", 1);
                             handler.send(obj);
 
-                            tank.setDirection(1);
+                            //tank.setDirection(1);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
