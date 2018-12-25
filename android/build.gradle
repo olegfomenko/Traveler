@@ -19,7 +19,7 @@ android {
     }
     defaultConfig {
         applicationId "com.fomenko.game"
-        minSdkVersion 9
+        minSdkVersion 21        
         targetSdkVersion 28
     }
 }

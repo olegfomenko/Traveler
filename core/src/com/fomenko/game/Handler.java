@@ -32,10 +32,6 @@ public class Handler {
     public void send(JSONObject request) {
         try {
             request.put("check_code", check_code = (int)(Math.random() * 1000000000));
-            //System.out.println("GENERATED = " + check_code);
-            /*synchronized (codes) {
-                codes.add(check_code);
-            }*/
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -47,70 +43,55 @@ public class Handler {
         @Override
         public void run() {
             while (true) {
-                synchronized (tanks) {
-                    try {
-                        byte[] buffer = new byte[1000000];
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                try {
+                    byte[] buffer = new byte[1000000];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-                        socket.receive(packet);
+                    socket.receive(packet);
 
-                        buffer = packet.getData();
-                        int last = 0;
-                        for (; last < buffer.length; ++last) if (buffer[last] == 0) break;
+                    buffer = packet.getData();
+                    int last = 0;
+                    for (; last < buffer.length; ++last) if (buffer[last] == 0) break;
 
-                        String request = new String(buffer, 0, last);
+                    String request = new String(buffer, 0, last);
 
-                        JSONObject obj = new JSONObject(request);
+                    JSONObject obj = new JSONObject(request);
 
-                        //System.out.println(codes + "                   CHECK = " + check_code + "   REQUES_CHECK = " + obj.getInt("check_code"));
 
-                       /* if(!codes.contains(obj.getInt("check_code"))) continue;
-                        while (true) {
-                            if(codes.getFirst() == obj.getInt("check_code")) {
-                                codes.removeFirst();
-                                break;
-                            }
+                    if(obj.getString("type").equals("UPDATE")) {
+                        if(check_code != obj.getInt("check_code")) continue;
 
-                            if(codes.getFirst() < obj.getInt("check_code")) {
-                                codes.removeFirst();
-                            } else break;
-                        }*/
+                        JSONArray arr = obj.getJSONArray("TANKS");
 
-                        //while (pq.size() > 0 && pq.peek() <= obj.getInt("check_code")) pq.remove();
-
-                        if(obj.getString("type").equals("UPDATE")) {
-                            if(check_code != obj.getInt("check_code")) continue;
-
-                            JSONArray arr = obj.getJSONArray("TANKS");
-
-                            for(int i = 0; i < arr.length(); ++i) {
+                        for(int i = 0; i < arr.length(); ++i) {
+                            try {
                                 obj = arr.getJSONObject(i);
-                                Tank tank = tanks.get(obj.getInt("index"));
-                                tank.setX(Float.parseFloat(obj.getString("x")));
-                                tank.setY(Float.parseFloat(obj.getString("y")));
-                                tank.setDirection(obj.getInt("direction"));
-
-                                /*if(obj.getInt("index") == 0) {
-                                    System.out.println("NEW _______________________"
-                                            + Float.parseFloat(obj.getString("x"))
-                                            + " " + Float.parseFloat(obj.getString("y"))
-                                            + " " + Float.parseFloat(obj.getString("direction")));
-                                }*/
+                                synchronized (tanks) {
+                                    Tank tank = tanks.get(obj.getInt("index"));
+                                    tank.setX(Float.parseFloat(obj.getString("x")));
+                                    tank.setY(Float.parseFloat(obj.getString("y")));
+                                    tank.setDirection(obj.getInt("direction"));
+                                }
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
                             }
-                        } else if(obj.getString("type").equals("ADD")) {
-                            Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
-                            tank.setDirection(obj.getInt("direction"));
+                        }
+                    } else if(obj.getString("type").equals("ADD")) {
+                        Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
+                        tank.setDirection(obj.getInt("direction"));
+                        synchronized (tanks) {
                             tanks.put(obj.getInt("index"), tank);
                         }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        break;
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
+
         }
     }
 

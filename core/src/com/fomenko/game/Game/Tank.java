@@ -69,20 +69,4 @@ public class Tank {
             if(direction == 4) x += speed * dt;
         }
     }
-
-   /* public synchronized void render(SpriteBatch sb) {
-        switch (direction) {
-            case 1: sb.draw(tank1, x, y, width, height); break;
-            case 2: sb.draw(tank2, x, y, width, height); break;
-            case 3: sb.draw(tank3, x, y, width, height); break;
-            case 4: sb.draw(tank4, x, y, width, height); break;
-        }
-    }
-
-    public void dispose() {
-        tank1.dispose();
-        tank2.dispose();
-        tank3.dispose();
-        tank4.dispose();
-    }*/
 }

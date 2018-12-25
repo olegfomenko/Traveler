@@ -26,7 +26,7 @@ public class Main extends ApplicationAdapter {
 	private SpriteBatch sb;
 	private GameStateManager gsm;
 	public static float HEIGHT = 720, WIDTH = 400;
-	public static String address = "192.168.1.44";
+	public static String address = "192.168.0.101";
 	public static final int port = 5000;
 	private DatagramSocket socket;
 	
@@ -53,7 +53,7 @@ public class Main extends ApplicationAdapter {
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(address), port);
 			socket.send(packet);
 
-			buffer = new byte[1000];
+			buffer = new byte[1000000];
 			packet = new DatagramPacket(buffer, buffer.length);
 			socket.receive(packet);
 
@@ -69,13 +69,15 @@ public class Main extends ApplicationAdapter {
 			Tank t = null;
 
 			for(int i = 0; i < arr.length(); ++i) {
-				obj = arr.getJSONObject(i);
-				Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
-				tank.setDirection(obj.getInt("direction"));
-				tanks.put(obj.getInt("index"), tank);
+				synchronized (tanks) {
+					obj = arr.getJSONObject(i);
+					Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
+					tank.setDirection(obj.getInt("direction"));
+					tanks.put(obj.getInt("index"), tank);
 
-				if(obj.getInt("index") == index) {
-					t = tank;
+					if(obj.getInt("index") == index) {
+						t = tank;
+					}
 				}
 			}
 

@@ -15,6 +15,7 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Game extends State {
@@ -73,7 +74,7 @@ public class Game extends State {
                             obj.put("direction", 4);
                             handler.send(obj);
 
-                            //tank.setDirection(4);
+                            tank.setDirection(4);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -85,7 +86,7 @@ public class Game extends State {
                             obj.put("direction", 3);
                             handler.send(obj);
 
-                            //tank.setDirection(3);
+                            tank.setDirection(3);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -101,7 +102,7 @@ public class Game extends State {
                             obj.put("direction", 2);
                             handler.send(obj);
 
-                            //tank.setDirection(2);
+                            tank.setDirection(2);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -113,7 +114,7 @@ public class Game extends State {
                             obj.put("direction", 1);
                             handler.send(obj);
 
-                            //tank.setDirection(1);
+                            tank.setDirection(1);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -130,10 +131,11 @@ public class Game extends State {
             pressed = false;
         }
 
-        Object[] o = tanks.values().toArray();
-        for(int i = 0; i < o.length; ++i) {
-            Tank t = (Tank)o[i];
-            t.update(dt);
+        synchronized (tanks) {
+            ArrayList<Tank> lt = new ArrayList<Tank>(tanks.values());
+            for(int i = 0; i < lt.size(); ++i) {
+                lt.get(i).update(dt);
+            }
         }
 
         try {
@@ -156,11 +158,13 @@ public class Game extends State {
         sb.begin();
         sb.draw(background, 0, 0, FIELD_WIDTH, FIELD_HEIGHT);
 
-        //TODO опасное место?
-        Object[] o = tanks.values().toArray();
-        for(int i = 0; i < o.length; ++i) {
-            drawTank((Tank)o[i], sb);
+        synchronized (tanks) {
+            ArrayList<Tank> lt = new ArrayList<Tank>(tanks.values());
+            for(int i = 0; i < lt.size(); ++i) {
+                drawTank(lt.get(i), sb);
+            }
         }
+
 
         sb.end();
     }
