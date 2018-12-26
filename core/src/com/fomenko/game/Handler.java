@@ -19,6 +19,7 @@ public class Handler {
     private volatile LinkedList<Integer> codes;
     private DatagramSocket socket;
     private volatile static int check_code = 0;
+    public static final int magicNumber = 1000000000;
 
 
     public Handler(HashMap<Integer, Tank> tanks, DatagramSocket socket) {
@@ -31,7 +32,7 @@ public class Handler {
 
     public void send(JSONObject request) {
         try {
-            request.put("check_code", check_code = (int)(Math.random() * 1000000000));
+            request.put("check_code", check_code = (int)(Math.random() * magicNumber));
         } catch (JSONException e) {
             e.printStackTrace();
         }

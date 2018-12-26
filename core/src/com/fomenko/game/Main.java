@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.fomenko.game.Game.Tank;
+import com.fomenko.game.Game.Wall;
 import com.fomenko.game.States.Game;
 
 import org.json.JSONArray;
@@ -71,7 +73,10 @@ public class Main extends ApplicationAdapter {
 			for(int i = 0; i < arr.length(); ++i) {
 				synchronized (tanks) {
 					obj = arr.getJSONObject(i);
-					Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
+					Tank tank = new Tank(Float.parseFloat(obj.getString("x")),
+											Float.parseFloat(obj.getString("y")),
+												obj.getInt("index"));
+
 					tank.setDirection(obj.getInt("direction"));
 					tanks.put(obj.getInt("index"), tank);
 
@@ -81,7 +86,18 @@ public class Main extends ApplicationAdapter {
 				}
 			}
 
-			gsm.push(new Game(gsm, socket, tanks, t));
+			ArrayList<Wall> walls = new ArrayList<Wall>();
+			arr = new JSONObject(s).getJSONArray("WALLS");
+
+			for(int i = 0; i < arr.length(); ++i) {
+				obj = arr.getJSONObject(i);
+				walls.add(new Wall(Float.parseFloat(obj.getString("x")),
+										Float.parseFloat(obj.getString("y")),
+												Float.parseFloat(obj.getString("width")),
+														Float.parseFloat(obj.getString("height"))));
+			}
+
+			gsm.push(new Game(gsm, socket, tanks, t, walls));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (SocketException e) {

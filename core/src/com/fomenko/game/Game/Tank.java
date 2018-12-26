@@ -2,6 +2,9 @@ package com.fomenko.game.Game;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+
+import java.util.ArrayList;
 
 public class Tank {
     private volatile float x, y;
@@ -61,12 +64,24 @@ public class Tank {
     }
 
 
-    public synchronized void update(float dt) {
+    public synchronized void update(float dt, ArrayList<Wall> walls) {
         synchronized (this) {
             if(direction == 1) y += speed * dt;
             if(direction == 2) y -= speed * dt;
             if(direction == 3) x -= speed * dt;
             if(direction == 4) x += speed * dt;
+        }
+
+        for(Wall w : walls) {
+            if(new Rectangle(x, y, width, height).overlaps(new Rectangle(w.getX(), w.getY(), w.getWidth(), w.getHeight()))) {
+                switch (direction) {
+                    case 1: direction = 2; break;
+                    case 2: direction = 1; break;
+                    case 3: direction = 4; break;
+                    case 4: direction = 3; break;
+                }
+                break;
+            }
         }
     }
 }
