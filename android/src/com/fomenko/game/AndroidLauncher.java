@@ -16,8 +16,8 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useImmersiveMode = true;
 		Window w = getWindow();
-		w.setAttributes(new WindowManager.LayoutParams(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT));
-
+		w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		w.setAttributes(new WindowManager.LayoutParams(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES));
 		initialize(new Main(), config);
 	}
 }

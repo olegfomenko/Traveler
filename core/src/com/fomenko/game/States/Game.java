@@ -24,6 +24,7 @@ public class Game extends State {
 
     private volatile HashMap<Integer,  Tank> tanks;
     private ArrayList<Wall> walls;
+    private ArrayList<Tank> lt;
     private boolean pressed;
     private float x, y;
     private float minDY = 20, minDX = 20, needDY = 50, needDX = 50;
@@ -39,17 +40,17 @@ public class Game extends State {
         this.tank = tank;
         this.walls = walls;
 
-        background = new Texture("back.png");
+        background = new Texture("whitebg2.png");
         pressed = false;
 
         handler = new Handler(tanks, socket);
 
-        tank1 = new Texture("upTank.png");
-        tank2 = new Texture("downTank.png");
-        tank3 = new Texture("leftTank.png");
-        tank4 = new Texture("rightTank.png");
+        tank1 = new Texture("upwTank.png");
+        tank2 = new Texture("downwTank.png");
+        tank3 = new Texture("leftwTank.png");
+        tank4 = new Texture("rightwTank.png");
 
-        wall = new Texture("wall.png");
+        wall = new Texture("blackwall.png");
     }
 
     @Override
@@ -93,10 +94,10 @@ public class Game extends State {
         }
 
         synchronized (tanks) {
-            ArrayList<Tank> lt = new ArrayList<Tank>(tanks.values());
-            for(int i = 0; i < lt.size(); ++i) {
-                lt.get(i).update(dt, walls);
-            }
+            lt = new ArrayList<Tank>(tanks.values());
+        }
+        for(int i = 0; i < lt.size(); ++i) {
+            lt.get(i).update(dt, walls);
         }
 
         try {
@@ -134,11 +135,13 @@ public class Game extends State {
         sb.begin();
         sb.draw(background, 0, 0, FIELD_WIDTH, FIELD_HEIGHT);
 
+
         synchronized (tanks) {
-            ArrayList<Tank> lt = new ArrayList<Tank>(tanks.values());
-            for(int i = 0; i < lt.size(); ++i) {
-                drawTank(lt.get(i), sb);
-            }
+            lt = new ArrayList<Tank>(tanks.values());
+        }
+
+        for(int i = 0; i < lt.size(); ++i) {
+            drawTank(lt.get(i), sb);
         }
 
         for (Wall w : walls) drawWall(w, sb);

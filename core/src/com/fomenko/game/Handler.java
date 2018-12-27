@@ -68,20 +68,20 @@ public class Handler {
                             try {
                                 obj = arr.getJSONObject(i);
                                 synchronized (tanks) {
-                                    Tank tank = tanks.get(obj.getInt("index"));
-                                    tank.setX(Float.parseFloat(obj.getString("x")));
-                                    tank.setY(Float.parseFloat(obj.getString("y")));
-                                    tank.setDirection(obj.getInt("direction"));
+                                    if(!tanks.containsKey(obj.getInt("index"))) {
+                                        Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
+                                        tank.setDirection(obj.getInt("direction"));
+                                        tanks.put(obj.getInt("index"), tank);
+                                    } else {
+                                        Tank tank = tanks.get(obj.getInt("index"));
+                                        tank.setX(Float.parseFloat(obj.getString("x")));
+                                        tank.setY(Float.parseFloat(obj.getString("y")));
+                                        tank.setDirection(obj.getInt("direction"));
+                                    }
                                 }
                             } catch (NullPointerException e) {
                                 e.printStackTrace();
                             }
-                        }
-                    } else if(obj.getString("type").equals("ADD")) {
-                        Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
-                        tank.setDirection(obj.getInt("direction"));
-                        synchronized (tanks) {
-                            tanks.put(obj.getInt("index"), tank);
                         }
                     }
 

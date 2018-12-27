@@ -65,13 +65,6 @@ public class Tank {
 
 
     public synchronized void update(float dt, ArrayList<Wall> walls) {
-        synchronized (this) {
-            if(direction == 1) y += speed * dt;
-            if(direction == 2) y -= speed * dt;
-            if(direction == 3) x -= speed * dt;
-            if(direction == 4) x += speed * dt;
-        }
-
         for(Wall w : walls) {
             if(new Rectangle(x, y, width, height).overlaps(new Rectangle(w.getX(), w.getY(), w.getWidth(), w.getHeight()))) {
                 switch (direction) {
@@ -82,6 +75,13 @@ public class Tank {
                 }
                 break;
             }
+        }
+
+        synchronized (this) {
+            if(direction == 1) y += speed * dt;
+            if(direction == 2) y -= speed * dt;
+            if(direction == 3) x -= speed * dt;
+            if(direction == 4) x += speed * dt;
         }
     }
 }
