@@ -4,11 +4,13 @@ import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
 
-public class Tank extends GameObject {
+public class Ball extends GameObject {
     private int index;
+    public static final long DELTA = 5000;
+    private static int last = 0;
 
-    public Tank(float x, float y, int index, int direction) {
-        super(x, y, 64, 64, direction, 120);
+    public Ball(float x, float y, int index, int direction) {
+        super(x, y, 15, 15, direction,180);
         this.index = index;
     }
 

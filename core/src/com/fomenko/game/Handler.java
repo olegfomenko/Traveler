@@ -1,4 +1,5 @@
 package com.fomenko.game;
+import com.fomenko.game.Game.Ball;
 import com.fomenko.game.Game.Tank;
 
 import org.json.JSONArray;
@@ -10,29 +11,29 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 
 public class Handler {
     private volatile HashMap<Integer, Tank> tanks;
-    private volatile LinkedList<Integer> codes;
+    private volatile HashMap<Integer, Ball> balls;
     private DatagramSocket socket;
     private volatile static int check_code = 0;
     public static final int magicNumber = 1000000000;
 
 
-    public Handler(HashMap<Integer, Tank> tanks, DatagramSocket socket) {
+    public Handler(HashMap<Integer, Tank> tanks,HashMap<Integer, Ball> balls, DatagramSocket socket) {
         this.tanks = tanks;
+        this.balls = balls;
         this.socket = socket;
-        codes = new LinkedList<Integer>();
         new Thread(new Get()).start();
-
     }
 
     public void send(JSONObject request) {
         try {
-            request.put("check_code", check_code = (int)(Math.random() * magicNumber));
+            request.put("c", check_code = (int)(Math.random() * magicNumber));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -60,7 +61,7 @@ public class Handler {
 
 
                     if(obj.getString("type").equals("UPDATE")) {
-                        if(check_code != obj.getInt("check_code")) continue;
+                        if(check_code != obj.getInt("c")) continue;
 
                         JSONArray arr = obj.getJSONArray("TANKS");
 
@@ -68,15 +69,35 @@ public class Handler {
                             try {
                                 obj = arr.getJSONObject(i);
                                 synchronized (tanks) {
-                                    if(!tanks.containsKey(obj.getInt("index"))) {
-                                        Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("index"));
-                                        tank.setDirection(obj.getInt("direction"));
-                                        tanks.put(obj.getInt("index"), tank);
+                                    if(!tanks.containsKey(obj.getInt("i"))) {
+                                        Tank tank = new Tank(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("i"), obj.getInt("d"));
+                                        tanks.put(obj.getInt("i"), tank);
                                     } else {
-                                        Tank tank = tanks.get(obj.getInt("index"));
+                                        Tank tank = tanks.get(obj.getInt("i"));
                                         tank.setX(Float.parseFloat(obj.getString("x")));
                                         tank.setY(Float.parseFloat(obj.getString("y")));
-                                        tank.setDirection(obj.getInt("direction"));
+                                        tank.setDirection(obj.getInt("d"));
+                                    }
+                                }
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        arr = new JSONObject(request).getJSONArray("BALLS");
+
+                        for(int i = 0; i < arr.length(); ++i) {
+                            try {
+                                obj = arr.getJSONObject(i);
+                                synchronized (balls) {
+                                    if(!balls.containsKey(obj.getInt("i"))) {
+                                        Ball ball = new Ball(Float.parseFloat(obj.getString("x")), Float.parseFloat(obj.getString("y")), obj.getInt("i"), obj.getInt("d"));
+                                        balls.put(obj.getInt("i"), ball);
+                                    } else {
+                                        Ball ball = balls.get(obj.getInt("i"));
+                                        ball.setX(Float.parseFloat(obj.getString("x")));
+                                        ball.setY(Float.parseFloat(obj.getString("y")));
+                                        ball.setDirection(obj.getInt("d"));
                                     }
                                 }
                             } catch (NullPointerException e) {

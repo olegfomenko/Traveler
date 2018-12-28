@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.fomenko.game.Game.Ball;
 import com.fomenko.game.Game.Tank;
 import com.fomenko.game.Game.Wall;
 import com.fomenko.game.GameStateManager;
@@ -23,8 +24,10 @@ public class Game extends State {
     private Texture wall;
 
     private volatile HashMap<Integer,  Tank> tanks;
+    private volatile HashMap<Integer, Ball> balls;
     private ArrayList<Wall> walls;
     private ArrayList<Tank> lt;
+    private ArrayList<Ball> bt;
     private boolean pressed;
     private float x, y;
     private float minDY = 20, minDX = 20, needDY = 50, needDX = 50;
@@ -33,17 +36,18 @@ public class Game extends State {
 
     private Handler handler;
 
-    public Game(GameStateManager gsm, DatagramSocket socket, HashMap<Integer, Tank> tanks, Tank tank, ArrayList<Wall> walls) {
+    public Game(GameStateManager gsm, DatagramSocket socket, HashMap<Integer, Tank> tanks, HashMap<Integer, Ball> balls, Tank tank, ArrayList<Wall> walls) {
         super(gsm);
         this.socket = socket;
         this.tanks = tanks;
+        this.balls = balls;
         this.tank = tank;
         this.walls = walls;
 
         background = new Texture("whitebg2.png");
         pressed = false;
 
-        handler = new Handler(tanks, socket);
+        handler = new Handler(tanks,balls, socket);
 
         tank1 = new Texture("upwTank.png");
         tank2 = new Texture("downwTank.png");
@@ -100,10 +104,17 @@ public class Game extends State {
             lt.get(i).update(dt, walls);
         }
 
+        synchronized (balls) {
+            bt = new ArrayList<Ball>(balls.values());
+        }
+        for(int i = 0; i < bt.size(); ++i) {
+            bt.get(i).update(dt, walls);
+        }
+
         try {
             JSONObject request = new JSONObject();
             request.put("type", "GET");
-            request.put("index", tank.getIndex());
+            request.put("i", tank.getIndex());
             handler.send(request);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -117,11 +128,11 @@ public class Game extends State {
         try {
             JSONObject obj = new JSONObject();
             obj.put("type", "UPDATE");
-            obj.put("index", tank.getIndex());
-            obj.put("direction", direction);
+            obj.put("i", tank.getIndex());
+            obj.put("d", direction);
             handler.send(obj);
 
-            tank.setDirection(direction);
+            //tank.setDirection(direction);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -144,6 +155,14 @@ public class Game extends State {
             drawTank(lt.get(i), sb);
         }
 
+        synchronized (balls) {
+            bt = new ArrayList<Ball>(balls.values());
+        }
+
+        for(int i = 0; i < bt.size(); ++i) {
+            sb.draw(wall, bt.get(i).getX(), bt.get(i).getY(), bt.get(i).getWidth(), bt.get(i).getHeight());
+        }
+
         for (Wall w : walls) drawWall(w, sb);
 
         sb.end();
@@ -152,10 +171,10 @@ public class Game extends State {
     private void drawTank(Tank t, SpriteBatch sb) {
         synchronized (t) {
             switch (t.getDirection()) {
-                case 1: sb.draw(tank1, t.getX(), t.getY(), t.width, t.height); break;
-                case 2: sb.draw(tank2, t.getX(), t.getY(), t.width, t.height); break;
-                case 3: sb.draw(tank3, t.getX(), t.getY(), t.width, t.height); break;
-                case 4: sb.draw(tank4, t.getX(), t.getY(), t.width, t.height); break;
+                case 1: sb.draw(tank1, t.getX(), t.getY(), t.getWidth(), t.getHeight()); break;
+                case 2: sb.draw(tank2, t.getX(), t.getY(), t.getWidth(), t.getHeight()); break;
+                case 3: sb.draw(tank3, t.getX(), t.getY(), t.getWidth(), t.getHeight()); break;
+                case 4: sb.draw(tank4, t.getX(), t.getY(), t.getWidth(), t.getHeight()); break;
             }
         }
     }
