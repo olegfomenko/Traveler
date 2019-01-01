@@ -111,6 +111,20 @@ public class Game extends State {
             bt.get(i).update(dt, walls);
         }
 
+        for(int i = 0; i < bt.size(); ++i) {
+            if(bt.get(i).getRectangle().overlaps(tank.getRectangle())) {
+                gsm.pop();
+                gsm.push(new GameOver(gsm));
+            }
+        }
+
+        for(int i = 0; i < lt.size(); ++i)
+            for(int j = 0; j < bt.size(); ++j)
+                if(lt.get(i).getRectangle().overlaps(bt.get(j).getRectangle()))
+                    synchronized (tanks) {
+                        tanks.remove(lt.get(i).getIndex());
+                    }
+
         try {
             JSONObject request = new JSONObject();
             request.put("type", "GET");
@@ -132,7 +146,7 @@ public class Game extends State {
             obj.put("d", direction);
             handler.send(obj);
 
-            //tank.setDirection(direction);
+            tank.setDirection(direction);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -188,6 +202,7 @@ public class Game extends State {
         background.dispose();
         //for(Tank t : tanks.values()) t.dispose();
         //handler.send("STOP");
+        handler.closeAll();
 
         tank1.dispose();
         tank2.dispose();

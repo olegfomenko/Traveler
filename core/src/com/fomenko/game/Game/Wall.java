@@ -1,5 +1,7 @@
 package com.fomenko.game.Game;
 
+import com.badlogic.gdx.math.Rectangle;
+
 public class Wall {
     private float x, y, width, height;
 
@@ -8,6 +10,10 @@ public class Wall {
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    public synchronized Rectangle getRectangle() {
+        return new Rectangle(x, y, width, height);
     }
 
     public float getX() {

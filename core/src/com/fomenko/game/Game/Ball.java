@@ -10,7 +10,7 @@ public class Ball extends GameObject {
     private static int last = 0;
 
     public Ball(float x, float y, int index, int direction) {
-        super(x, y, 15, 15, direction,180);
+        super(x, y, 16, 16, direction,180);
         this.index = index;
     }
 
@@ -20,7 +20,7 @@ public class Ball extends GameObject {
 
     public synchronized void update(float dt, ArrayList<Wall> walls) {
         for(Wall w : walls) {
-            if(new Rectangle(getX(), getY(), getWidth(), getHeight()).overlaps(new Rectangle(w.getX(), w.getY(), w.getWidth(), w.getHeight()))) {
+            if(getRectangle().overlaps(w.getRectangle())) {
                 switch (getDirection()) {
                     case 1: setDirection(2); break;
                     case 2: setDirection(1); break;

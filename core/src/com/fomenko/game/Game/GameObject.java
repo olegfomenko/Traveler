@@ -1,5 +1,8 @@
 package com.fomenko.game.Game;
 
+
+import com.badlogic.gdx.math.Rectangle;
+
 public class GameObject {
     private volatile float x, y;
     private volatile int direction; // 1 - up   2 - down   3 - left   4 - right
@@ -14,6 +17,10 @@ public class GameObject {
         this.height = height;
         this.direction = direction;
         this.speed = speed;
+    }
+
+    public synchronized Rectangle getRectangle() {
+        return new Rectangle(x, y, width, height);
     }
 
     public float getWidth() {

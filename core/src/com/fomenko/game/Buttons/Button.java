@@ -1,4 +1,4 @@
-package com.fomenko.game;
+package com.fomenko.game.Buttons;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -36,6 +36,10 @@ public class Button {
         return y;
     }
 
+    public boolean isPress() {
+        return press;
+    }
+
     public boolean isPressed() {
         return pressed;
     }
@@ -50,6 +54,10 @@ public class Button {
 
     public void setPressed(boolean pressed) {
         this.pressed = pressed;
+    }
+
+    public void setPress(boolean press) {
+        this.press = press;
     }
 
     public Rectangle getButton() {
@@ -77,6 +85,11 @@ public class Button {
     public void dispose() {
         button.dispose();
         button_press.dispose();
-        button_pressed.dispose();
+
+        try {
+            button_pressed.dispose();
+        } catch (NullPointerException e) {
+            //e.printStackTrace();
+        }
     }
 }

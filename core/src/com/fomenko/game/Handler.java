@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,15 +21,27 @@ public class Handler {
     private volatile HashMap<Integer, Tank> tanks;
     private volatile HashMap<Integer, Ball> balls;
     private DatagramSocket socket;
+    private Thread getter;
     private volatile static int check_code = 0;
     public static final int magicNumber = 1000000000;
-
 
     public Handler(HashMap<Integer, Tank> tanks,HashMap<Integer, Ball> balls, DatagramSocket socket) {
         this.tanks = tanks;
         this.balls = balls;
         this.socket = socket;
-        new Thread(new Get()).start();
+        getter = new Thread(new Get());
+        getter.start();
+    }
+
+    public static DatagramSocket createConnection(int port) throws SocketException {
+        DatagramSocket socket = new DatagramSocket(port);
+        return socket;
+    }
+
+    public void closeAll() {
+        socket.close();
+        getter.interrupt();
+        System.out.println("Get thread has been interrupted!");
     }
 
     public void send(JSONObject request) {

@@ -12,7 +12,7 @@ import static com.fomenko.game.States.Game.FIELD_WIDTH;
 
 
 public class State {
-    private GameStateManager gsm;
+    protected GameStateManager gsm;
     protected Texture background;
     protected OrthographicCamera camera;
 
