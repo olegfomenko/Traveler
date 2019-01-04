@@ -2,6 +2,7 @@ package com.fomenko.game.States;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.fomenko.game.Game.Ball;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 public class Game extends State {
     private Tank tank;
     private Texture tank1, tank2, tank3, tank4;
-    private Texture wall;
+    private Texture wall, ball;
 
     private volatile HashMap<Integer,  Tank> tanks;
     private volatile HashMap<Integer, Ball> balls;
@@ -29,12 +30,14 @@ public class Game extends State {
     private ArrayList<Tank> lt;
     private ArrayList<Ball> bt;
     private boolean pressed;
-    private float x, y;
-    private float minDY = 20, minDX = 20, needDY = 50, needDX = 50;
+    private float x, y, sx, sy;
+    private float minDY = 20, minDX = 20, needDY = 30, needDX = 30;
     public static final float FIELD_WIDTH = 3000, FIELD_HEIGHT = 3000;
     private DatagramSocket socket;
 
     private Handler handler;
+
+    private BitmapFont bf;
 
     public Game(GameStateManager gsm, DatagramSocket socket, HashMap<Integer, Tank> tanks, HashMap<Integer, Ball> balls, Tank tank, ArrayList<Wall> walls) {
         super(gsm);
@@ -55,6 +58,12 @@ public class Game extends State {
         tank4 = new Texture("rightwTank.png");
 
         wall = new Texture("blackwall.png");
+        ball = new Texture("ball.png");
+
+        bf = new BitmapFont();
+
+        camera.position.set(tank.getX() + tank.getWidth() / 2, tank.getY() + tank.getHeight() / 2, 0);
+        camera.update();
     }
 
     @Override
@@ -67,34 +76,35 @@ public class Game extends State {
             curX = v.x;
             curY = v.y;
 
-            if(pressed) {
-                float dx = Math.abs(curX - x);
-                float dy = Math.abs(curY - y);
-
-                if(dx >= needDX && dx > dy) {
-                    if(x < curX) {
-                        changeDirection(4);
-                    } else {
-                        changeDirection(3);
-                    }
-                 }
-
-                if(dy >= needDY && dy > dx) {
-                    if(y > curY) {
-                        changeDirection(2);
-                    } else {
-                        changeDirection(1);
-                    }
-                }
-
-            } else {
-                pressed = true;
-                x = curX;
-                y = curY;
+            if(!pressed) {
+                sx = curX;
+                sy = curY;
             }
 
-        } else {
+            pressed = true;
+            x = curX;
+            y = curY;
+        } else if(pressed) {
             pressed = false;
+            float dx = Math.abs(sx - x);
+            float dy = Math.abs(sy - y);
+
+            if(dx >= needDX && dx > dy) {
+                if(x > sx) {
+                    changeDirection(4);
+                } else {
+                    changeDirection(3);
+                }
+            }
+
+            if(dy >= needDY && dy > dx) {
+                if(y < sy) {
+                    changeDirection(2);
+                } else {
+                    changeDirection(1);
+                }
+            }
+
         }
 
         synchronized (tanks) {
@@ -117,6 +127,7 @@ public class Game extends State {
                 gsm.push(new GameOver(gsm));
             }
         }
+
 
         for(int i = 0; i < lt.size(); ++i)
             for(int j = 0; j < bt.size(); ++j)
@@ -146,7 +157,7 @@ public class Game extends State {
             obj.put("d", direction);
             handler.send(obj);
 
-            tank.setDirection(direction);
+            //tank.setDirection(direction);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -174,10 +185,12 @@ public class Game extends State {
         }
 
         for(int i = 0; i < bt.size(); ++i) {
-            sb.draw(wall, bt.get(i).getX(), bt.get(i).getY(), bt.get(i).getWidth(), bt.get(i).getHeight());
+            sb.draw(ball, bt.get(i).getX(), bt.get(i).getY(), bt.get(i).getWidth(), bt.get(i).getHeight());
         }
 
         for (Wall w : walls) drawWall(w, sb);
+
+        bf.draw(sb, Long.toString(System.currentTimeMillis() - Handler.last_got_packet), camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2 - 10);
 
         sb.end();
     }
@@ -208,5 +221,7 @@ public class Game extends State {
         tank2.dispose();
         tank3.dispose();
         tank4.dispose();
+
+        bf.dispose();
     }
 }

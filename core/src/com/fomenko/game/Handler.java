@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 
@@ -22,13 +23,17 @@ public class Handler {
     private volatile HashMap<Integer, Ball> balls;
     private DatagramSocket socket;
     private Thread getter;
-    private volatile static int check_code = 0;
+    private volatile int check_code = 0, last_code = -1, last_update = -1;
+
     public static final int magicNumber = 1000000000;
+
+    public static long last_got_packet = 0;
 
     public Handler(HashMap<Integer, Tank> tanks,HashMap<Integer, Ball> balls, DatagramSocket socket) {
         this.tanks = tanks;
         this.balls = balls;
         this.socket = socket;
+
         getter = new Thread(new Get());
         getter.start();
     }
@@ -46,10 +51,12 @@ public class Handler {
 
     public void send(JSONObject request) {
         try {
-            request.put("c", check_code = (int)(Math.random() * magicNumber));
+            request.put("c", ++check_code);
+            if(request.get("type").equals("UPDATE")) last_update = check_code;
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         new Thread(new Send(request)).start();
     }
 
@@ -74,7 +81,10 @@ public class Handler {
 
 
                     if(obj.getString("type").equals("UPDATE")) {
-                        if(check_code != obj.getInt("c")) continue;
+                        if(last_code >= obj.getInt("c") || last_update > obj.getInt("c")) continue;
+                        last_code = obj.getInt("c");
+
+                        last_got_packet = System.currentTimeMillis();
 
                         JSONArray arr = obj.getJSONArray("TANKS");
 

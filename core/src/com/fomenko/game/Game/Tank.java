@@ -12,6 +12,7 @@ public class Tank extends GameObject {
         this.index = index;
     }
 
+
     public int getIndex() {
         return index;
     }

@@ -80,8 +80,9 @@ public class GameStart extends State {
 
 
     public void createGame() {
+        DatagramSocket socket = null;
         try {
-            DatagramSocket socket = Handler.createConnection(Main.port);
+            socket = Handler.createConnection(Main.port);
             JSONObject obj = new JSONObject();
             obj.put("type", "CREATE");
             byte[] buffer = obj.toString().getBytes();
@@ -91,12 +92,14 @@ public class GameStart extends State {
 
             buffer = new byte[1000000];
             packet = new DatagramPacket(buffer, buffer.length);
+            socket.setSoTimeout(1000);
             socket.receive(packet);
 
             int last = 0;
             for(; last < buffer.length; ++last) if(buffer[last] == 0) break;
 
             String s = new String(buffer, 0, last);
+            System.out.println(s);
             obj = new JSONObject(s);
 
             int index = obj.getInt("i");
@@ -149,11 +152,17 @@ public class GameStart extends State {
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            socket.close();
         } catch (SocketException e) {
             e.printStackTrace();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+            socket.close();
         } catch (JSONException e) {
+            e.printStackTrace();
+            socket.close();
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
     }

@@ -8,7 +8,8 @@ public class GameObject {
     private volatile int direction; // 1 - up   2 - down   3 - left   4 - right
     private volatile float width, height;
     private float speed;
-    public long last = System.currentTimeMillis(), cur, dt;
+
+    public static final float EPS = 3.0f;
 
     public GameObject(float x, float y, float width, float height, int direction, float speed) {
         this.x = x;
@@ -32,11 +33,11 @@ public class GameObject {
     }
 
     public synchronized void setX(float x) {
-        this.x = x;
+        if(Math.abs(this.x - x) > EPS) this.x = x;
     }
 
     public synchronized void setY(float y) {
-        this.y = y;
+        if(Math.abs(this.y - y) > EPS) this.y = y;
     }
 
     public synchronized float getX() {
@@ -53,10 +54,6 @@ public class GameObject {
 
     public synchronized void setDirection(int direction) {
         this.direction = direction;
-    }
-
-    public synchronized float getDt() {
-        return dt;
     }
 
     public synchronized void update(float dt) {
